@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const JsonRpcRequestSchema = z
     .object({
         jsonrpc: z.literal('2.0'),
-        method: z.string(),
+        method: z.string().min(1),
         params: z.any().optional(),
         id: z.union([z.number(), z.string()])
     })
@@ -41,7 +41,7 @@ export type JsonRpcBatchRequest = z.infer<typeof JsonRpcBatchRequestSchema>
 export const JsonRpcNotificationSchema = z
     .object({
         jsonrpc: z.literal('2.0'),
-        method: z.string(),
+        method: z.string().min(1),
         params: z.any().optional()
     })
     .refine((o) => o.params !== null)
