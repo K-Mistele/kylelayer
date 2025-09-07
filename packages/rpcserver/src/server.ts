@@ -108,7 +108,7 @@ export class JsonRpcServer<
      */
     public async handleMessage(
         serverMessage: any
-    ): Promise<JsonRpcResponse<z.infer<T_HANDLERS[keyof T_HANDLERS]['resultSchema']>> | void> {
+    ): Promise<JsonRpcResponse<z.infer<T_HANDLERS[keyof T_HANDLERS]['resultSchema']>> | null> {
         // Validate it as a JSON RPC request / notification; throwing the correct error if appropriate
         let message: JsonRpcServerMessage
         const { data, error } = JsonRpcServerMessageSchema.safeParse(serverMessage)
@@ -124,7 +124,8 @@ export class JsonRpcServer<
         }
         try {
             if ('id' in data) return await this.handleRpcRequest(data)
-            return await this.handleRpcNotification(data)
+            await this.handleRpcNotification(data)
+            return null
         } catch (error: unknown) {
             // If it's a custom server error use its' internal error information
             if (error instanceof CustomServerError && error.requestId) {
@@ -150,6 +151,7 @@ export class JsonRpcServer<
                     }
                 } satisfies JsonRpcErrorResponse
             }
+            return null
         }
     }
 
