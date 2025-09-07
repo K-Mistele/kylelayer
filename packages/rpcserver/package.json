@@ -1,0 +1,15 @@
+{
+    "name": "@kylelayer/rpcserver",
+    "module": "index.ts",
+    "type": "module",
+    "private": true,
+    "dependencies": {
+        "@kylelayer/protocol": "workspace:*"
+    },
+    "devDependencies": {
+        "@types/bun": "latest"
+    },
+    "peerDependencies": {
+        "typescript": "^5"
+    }
+}
