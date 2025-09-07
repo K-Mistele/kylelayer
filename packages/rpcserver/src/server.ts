@@ -157,10 +157,10 @@ export class JsonRpcServer<
             }
 
             // Otherwise return a standard internal server error
-            if (error && 'id' in (error as any) && (error as any)?.id) {
+            if (error && 'id' in data && (typeof data.id === 'string' || typeof data.id === 'number')) {
                 return {
                     jsonrpc: '2.0',
-                    id: (error as any)?.id ?? null,
+                    id: data.id,
                     error: {
                         code: JsonRpcErrorCode.INTERNAL_SERVER_ERROR,
                         message: (error as any)?.message ?? 'an unknown error occurred'

@@ -364,6 +364,7 @@ describe('RPC server tests', () => {
             }
 
             const result = await server.handleMessage(request)
+            console.log
             expect((result as any).id).toBe(42)
         })
     })
