@@ -81,11 +81,11 @@ export class JsonRpcServer<
     }
 
     /**
-     * Handle a raw string received e.g. from a UNIX domain socket.
+     * Handle a raw string received e.g. from a UNIX domain socket. returns the RPC response or null
      * @param message
      * @returns
      */
-    public async handleRawMessage(message: string): Promise<JsonRpcResponse | void> {
+    public async handleRawMessage(message: string): Promise<JsonRpcResponse | null> {
         // Try to parse the string if not return a parse error
         let requestObject: any
         try {
@@ -100,10 +100,11 @@ export class JsonRpcServer<
                 id: null
             } satisfies JsonRpcResponse
         }
+        return await this.handleMessage(requestObject)
     }
 
     /**
-     * Handle a JSON RPC server message - either a request or a notification
+     * Handle a JSON RPC server message - either a request or a notification. returns the response or null
      * @param serverMessage
      * @returns
      */
