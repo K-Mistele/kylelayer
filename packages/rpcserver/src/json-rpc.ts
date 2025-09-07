@@ -7,7 +7,7 @@ export const JsonRpcRequestSchema = z
         params: z.any().optional(),
         id: z.union([z.number(), z.string()])
     })
-    .refine((obj) => obj.method !== null)
+    .refine((obj) => obj.params !== null)
 
 export const JsonRpcSuccessResponseSchema = z.object({
     jsonrpc: z.literal('2.0'),
