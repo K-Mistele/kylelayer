@@ -8,22 +8,27 @@ export const JsonRpcRequestSchema = z
         id: z.union([z.number(), z.string()])
     })
     .refine((obj) => obj.params !== null)
+    .strict()
 
-export const JsonRpcSuccessResponseSchema = z.object({
-    jsonrpc: z.literal('2.0'),
-    result: z.any().nonoptional(),
-    id: z.union([z.number(), z.string()])
-})
-
-export const JsonRpcErrorResponseSchema = z.object({
-    jsonrpc: z.literal('2.0'),
-    id: z.union([z.number(), z.string(), z.null()]),
-    error: z.object({
-        code: z.number(),
-        message: z.string(),
-        data: z.any().optional()
+export const JsonRpcSuccessResponseSchema = z
+    .object({
+        jsonrpc: z.literal('2.0'),
+        result: z.any().nonoptional(),
+        id: z.union([z.number(), z.string()])
     })
-})
+    .strict()
+
+export const JsonRpcErrorResponseSchema = z
+    .object({
+        jsonrpc: z.literal('2.0'),
+        id: z.union([z.number(), z.string(), z.null()]),
+        error: z.object({
+            code: z.number(),
+            message: z.string(),
+            data: z.any().optional()
+        })
+    })
+    .strict()
 export type JsonRpcErrorResponse = z.infer<typeof JsonRpcErrorResponseSchema>
 export type JsonRpcSuccessResponse = z.infer<typeof JsonRpcSuccessResponseSchema>
 
