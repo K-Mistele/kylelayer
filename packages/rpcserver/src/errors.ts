@@ -15,7 +15,6 @@ export class JsonRpcError extends Error {
     public code: (typeof JsonRpcErrorCodes)[keyof typeof JsonRpcErrorCodes]
     public data?: any
     public requestId: number | string | null
-    public message: string
 
     constructor(options: {
         requestId: number | string | null

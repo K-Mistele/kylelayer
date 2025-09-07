@@ -3,7 +3,6 @@ import { z } from 'zod'
 import {
     CustomServerError,
     InvalidParametersError,
-    type JsonRpcError,
     JsonRpcErrorCodes as JsonRpcErrorCode,
     MethodNotFoundError
 } from './errors'
@@ -58,8 +57,8 @@ export function createNotificationhandler<T_METHOD extends string, T_PARAMS exte
 }
 
 export class JsonRpcServer<
-    const T_HANDLERS extends Record<string, ReturnType<typeof createRequestHandler>>,
-    const T_NOTIFICATIONS extends Record<string, ReturnType<typeof createNotificationhandler>>
+    const T_HANDLERS extends Record<string, any>,
+    const T_NOTIFICATIONS extends Record<string, any>
 > {
     public readonly handlers: T_HANDLERS
     public readonly notifications?: T_NOTIFICATIONS
@@ -173,7 +172,7 @@ export class JsonRpcServer<
         }
 
         // execute the result; this will be caught if it throws to get a server error
-        const result: z.infer<typeof method.resultSchema> = await Promise.resolve(method.handler(request.params))
+        const result: z.infer<typeof method.resultSchema> = await Promise.resolve(method.handler(params))
         return {
             id: request.id,
             jsonrpc: '2.0',
@@ -194,10 +193,8 @@ export class JsonRpcServer<
         }
 
         // execute the result; this will be caught if it throws to get a server error
-        await Promise.resolve(method.handler(notification.params))
+        await Promise.resolve(method.handler(params))
     }
-
-    private handleError(error: JsonRpcError) {}
 }
 
 const handler = new JsonRpcServer({
