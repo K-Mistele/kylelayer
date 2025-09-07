@@ -11,7 +11,7 @@ export const JsonRpcRequestSchema = z
 
 export const JsonRpcSuccessResponseSchema = z.object({
     jsonrpc: z.literal('2.0'),
-    result: z.any(),
+    result: z.any().nonoptional(),
     id: z.union([z.number(), z.string()])
 })
 
