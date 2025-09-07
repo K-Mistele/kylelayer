@@ -1,11 +1,13 @@
 import { z } from 'zod'
 
-export const JsonRpcRequestSchema = z.object({
-    jsonrpc: z.literal('2.0'),
-    method: z.string(),
-    params: z.any().optional(),
-    id: z.union([z.number(), z.string()])
-})
+export const JsonRpcRequestSchema = z
+    .object({
+        jsonrpc: z.literal('2.0'),
+        method: z.string(),
+        params: z.any().optional(),
+        id: z.union([z.number(), z.string()])
+    })
+    .refine((obj) => obj.method !== null)
 
 export const JsonRpcSuccessResponseSchema = z.object({
     jsonrpc: z.literal('2.0'),
@@ -42,6 +44,7 @@ export const JsonRpcNotificationSchema = z
         method: z.string(),
         params: z.any().optional()
     })
+    .refine((o) => o.params !== null)
     .strict()
 
 export type JsonRpcNotification = z.infer<typeof JsonRpcNotificationSchema>

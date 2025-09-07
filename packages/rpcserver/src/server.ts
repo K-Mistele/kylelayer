@@ -3,16 +3,17 @@ import { z } from 'zod'
 import {
     CustomServerError,
     InvalidParametersError,
+    JsonRpcError,
     JsonRpcErrorCodes as JsonRpcErrorCode,
     MethodNotFoundError
 } from './errors'
 import {
     type JsonRpcErrorResponse,
     type JsonRpcNotification,
+    JsonRpcNotificationSchema,
     type JsonRpcRequest,
+    JsonRpcRequestSchema,
     type JsonRpcResponse,
-    type JsonRpcServerMessage,
-    JsonRpcServerMessageSchema,
     type JsonRpcSuccessResponse
 } from './json-rpc'
 import type { Fallbackhandler as FallbackHandler } from './types'
@@ -109,9 +110,13 @@ export class JsonRpcServer<
     public async handleMessage(
         serverMessage: any
     ): Promise<JsonRpcResponse<z.infer<T_HANDLERS[keyof T_HANDLERS]['resultSchema']>> | null> {
+        console.log('parsing message:', serverMessage)
         // Validate it as a JSON RPC request / notification; throwing the correct error if appropriate
-        let message: JsonRpcServerMessage
-        const { data, error } = JsonRpcServerMessageSchema.safeParse(serverMessage)
+        const { data, error } =
+            'id' in serverMessage
+                ? JsonRpcRequestSchema.safeParse(serverMessage)
+                : JsonRpcNotificationSchema.safeParse(serverMessage)
+
         if (error) {
             return {
                 jsonrpc: '2.0',
@@ -127,6 +132,17 @@ export class JsonRpcServer<
             await this.handleRpcNotification(data)
             return null
         } catch (error: unknown) {
+            if (error instanceof JsonRpcError && error.requestId) {
+                return {
+                    jsonrpc: '2.0',
+                    id: error.requestId,
+                    error: {
+                        code: error.code,
+                        message: error.message,
+                        data: error.data
+                    }
+                }
+            }
             // If it's a custom server error use its' internal error information
             if (error instanceof CustomServerError && error.requestId) {
                 return {
@@ -161,6 +177,7 @@ export class JsonRpcServer<
             z.infer<T_HANDLERS[keyof T_HANDLERS]['paramsSchema']>
         >
     ): Promise<JsonRpcSuccessResponse> {
+        console.log('handling request:', request)
         // validate the method
         const method = this.handlers[request.method]
         if (!method) throw new MethodNotFoundError({ requestId: request.id, method: request.method })
@@ -170,6 +187,7 @@ export class JsonRpcServer<
         try {
             params = method.paramsSchema.parse(request.params)
         } catch (error: unknown) {
+            console.error('Invalid parameters error', error)
             throw new InvalidParametersError({ requestId: request.id, zodError: error as z.ZodError })
         }
 
