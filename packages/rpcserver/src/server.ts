@@ -10,13 +10,12 @@ import {
 import {
     type JsonRpcErrorResponse,
     type JsonRpcNotification,
-    JsonRpcNotificationSchema,
     type JsonRpcRequest,
-    JsonRpcRequestSchema,
     type JsonRpcResponse,
+    JsonRpcServerMessageSchema,
     type JsonRpcSuccessResponse
 } from './json-rpc'
-import type { Fallbackhandler as FallbackHandler } from './types'
+import { type Fallbackhandler as FallbackHandler, isJsonRpcRequest } from './types'
 
 /**
  * Strongly-typed way to create a method
@@ -113,10 +112,7 @@ export class JsonRpcServer<
     ): Promise<JsonRpcResponse<z.infer<T_HANDLERS[keyof T_HANDLERS]['resultSchema']>> | null> {
         console.log('parsing message:', serverMessage)
         // Validate it as a JSON RPC request / notification; throwing the correct error if appropriate
-        const { data, error } =
-            'id' in serverMessage
-                ? JsonRpcRequestSchema.safeParse(serverMessage)
-                : JsonRpcNotificationSchema.safeParse(serverMessage)
+        const { data, error } = JsonRpcServerMessageSchema.safeParse(serverMessage)
 
         if (error) {
             return {
@@ -129,7 +125,7 @@ export class JsonRpcServer<
             } satisfies JsonRpcErrorResponse
         }
         try {
-            if ('id' in data) return await this.handleRpcRequest(data)
+            if (isJsonRpcRequest(data)) return await this.handleRpcRequest(data)
             await this.handleRpcNotification(data)
             return null
         } catch (error: unknown) {

@@ -307,7 +307,8 @@ describe('RPC server tests', () => {
                     super({
                         requestId,
                         error: {
-                            code: -32000 as any,
+                            // @ts-expect-error this is intentional for testing purposes!
+                            code: -32000,
                             message: 'Custom test error',
                             data: { extra: 'info' }
                         }
