@@ -1,0 +1,38 @@
+{
+  "server": {
+    "socketPath": "/tmp/jsonrpc-proxy.sock"
+  },
+  "target": {
+    "socketPath": "/tmp/jsonrpc-target.sock"
+  },
+  "routing": {
+    "defaultAction": "forward",
+    "rules": [
+      { "type": "jsonRpcMethod", "value": "ping" },
+      { "type": "jsonRpcMethod", "value": "echo" },
+      { "type": "jsonRpcMethod", "value": "proxy.status" }
+    ]
+  },
+  "responses": {
+    "enableEcho": false,
+    "enableStatus": false,
+    "enableHealth": false,
+    "templates": [
+      {
+        "id": "ping",
+        "template": "{\"jsonrpc\":\"2.0\",\"result\":\"pong\",\"id\":null}"
+      },
+      {
+        "id": "echo",
+        "template": "{\"jsonrpc\":\"2.0\",\"result\":{\"echo\":\"${message}\"},\"id\":null}"
+      },
+      {
+        "id": "proxy.status",
+        "template": "{\"jsonrpc\":\"2.0\",\"result\":{\"status\":\"active\",\"timestamp\":\"${timestamp}\",\"uptime\":${messageCount}},\"id\":null}"
+      }
+    ]
+  },
+  "logging": {
+    "level": "info"
+  }
+}

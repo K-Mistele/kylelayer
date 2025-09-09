@@ -1,0 +1,36 @@
+{
+  "server": {
+    "socketPath": "/tmp/debug-proxy.sock"
+  },
+  "target": {
+    "socketPath": "/tmp/target.sock"
+  },
+  "routing": {
+    "defaultAction": "internal",
+    "rules": [
+      { "type": "contains", "value": "debug" },
+      { "type": "startsWith", "value": "echo" },
+      { "type": "regex", "value": "^(ping|status|health)$" }
+    ]
+  },
+  "responses": {
+    "enableEcho": true,
+    "enableStatus": true,
+    "enableHealth": true,
+    "templates": [
+      {
+        "id": "debug",
+        "template": "DEBUG: Message '${message}' from client ${clientId} at ${timestamp}"
+      },
+      {
+        "id": "info",
+        "template": "INFO: ${message}"
+      }
+    ]
+  },
+  "logging": {
+    "level": "debug",
+    "timestamp": true,
+    "colors": true
+  }
+}

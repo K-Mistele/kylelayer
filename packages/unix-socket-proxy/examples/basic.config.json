@@ -1,0 +1,19 @@
+{
+  "server": {
+    "socketPath": "/tmp/proxy.sock"
+  },
+  "target": {
+    "socketPath": "/tmp/target.sock"
+  },
+  "routing": {
+    "defaultAction": "forward"
+  },
+  "responses": {
+    "enableEcho": true,
+    "enableStatus": true,
+    "enableHealth": true
+  },
+  "logging": {
+    "level": "info"
+  }
+}

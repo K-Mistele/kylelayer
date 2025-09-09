@@ -1,0 +1,30 @@
+{
+  "name": "@kylelayer/unix-socket-proxy",
+  "version": "0.1.0",
+  "description": "Unix domain socket proxy CLI tool for intercepting and forwarding messages",
+  "type": "module",
+  "module": "src/index.ts",
+  "private": true,
+  "bin": {
+    "unix-socket-proxy": "src/cli.ts"
+  },
+  "scripts": {
+    "dev": "bun --hot src/cli.ts",
+    "build": "bun build src/cli.ts --outdir dist --target bun",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@kylelayer/protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./cli": "./src/cli.ts"
+  }
+}

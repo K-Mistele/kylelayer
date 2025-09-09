@@ -103,7 +103,7 @@ describe('RPC Client Tests', () => {
         test('Should create method definitions correctly', () => {
             for (const key of Object.keys(server.handlers)) {
                 // @ts-expect-error it's fine
-                expect(server.methods.includes(key))
+                expect(server.methods.includes(key)).toBe(true)
             }
         })
 
@@ -276,7 +276,7 @@ describe('RPC Client Tests', () => {
             
             try {
                 await client.call('slow_operation', { delay: 200 }, { timeout: 100 })
-                expect.fail('Should have timed out')
+                throw new Error('Expected timeout not reached')
             } catch (error) {
                 const elapsed = Date.now() - start
                 expect(error).toBeInstanceOf(Error)
