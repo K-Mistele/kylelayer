@@ -1,13 +1,10 @@
 {
-    "name": "server",
+    "name": "@kylelayer/rpc",
     "module": "index.ts",
     "type": "module",
     "private": true,
     "dependencies": {
-        "@kylelayer/rpc": "workspace:*",
-        "@kylelayer/eventemitter": "workspace:*",
-        "bun": "^1.2.21",
-        "events": "^3.3.0"
+        "@kylelayer/protocol": "workspace:*"
     },
     "devDependencies": {
         "@types/bun": "latest"

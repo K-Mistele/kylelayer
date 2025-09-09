@@ -1,4 +1,4 @@
-# server
+# rpcserver
 
 To install dependencies:
 

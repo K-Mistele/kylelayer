@@ -1,4 +1,4 @@
-# server
+# client
 
 To install dependencies:
 

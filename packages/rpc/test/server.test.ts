@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, test } from 'bun:test'
 import { z } from 'zod'
 import { CustomServerError, JsonRpcErrorCodes } from '../src/errors'
-import { JsonRpcServer, createNotificationhandler, createRequestHandler } from '../src/server'
+import { JsonRpcServer, createServerNotificationHandler, createServerRequestHandler } from '../src/server'
 
 describe('RPC server tests', () => {
     describe('createRequestHandler tests', () => {
         test('Creates valid request handler', () => {
-            const handler = createRequestHandler({
+            const handler = createServerRequestHandler({
                 method: 'test_method',
                 paramsSchema: z.object({ name: z.string() }),
                 resultSchema: z.string(),
@@ -20,7 +20,7 @@ describe('RPC server tests', () => {
         })
 
         test('Handler function works correctly', () => {
-            const handler = createRequestHandler({
+            const handler = createServerRequestHandler({
                 method: 'add',
                 paramsSchema: z.object({ a: z.number(), b: z.number() }),
                 resultSchema: z.number(),
@@ -34,7 +34,7 @@ describe('RPC server tests', () => {
 
     describe('createNotificationhandler tests', () => {
         test('Creates valid notification handler', () => {
-            const handler = createNotificationhandler({
+            const handler = createServerNotificationHandler({
                 method: 'notify_test',
                 paramsSchema: z.object({ message: z.string() }),
                 handler: (params) => {
@@ -52,7 +52,7 @@ describe('RPC server tests', () => {
         test('Creates server with handlers', () => {
             const server = new JsonRpcServer({
                 handlers: {
-                    test_method: createRequestHandler({
+                    test_method: createServerRequestHandler({
                         method: 'test_method',
                         paramsSchema: z.object({ name: z.string() }),
                         resultSchema: z.string(),
@@ -69,7 +69,7 @@ describe('RPC server tests', () => {
             const server = new JsonRpcServer({
                 handlers: {},
                 notifications: {
-                    notify_test: createNotificationhandler({
+                    notify_test: createServerNotificationHandler({
                         method: 'notify_test',
                         paramsSchema: z.object({ message: z.string() }),
                         handler: (params) => {}
@@ -87,7 +87,7 @@ describe('RPC server tests', () => {
         beforeEach(() => {
             server = new JsonRpcServer({
                 handlers: {
-                    echo: createRequestHandler({
+                    echo: createServerRequestHandler({
                         method: 'echo',
                         paramsSchema: z.object({ message: z.string() }),
                         resultSchema: z.string(),
@@ -136,13 +136,13 @@ describe('RPC server tests', () => {
         beforeEach(() => {
             server = new JsonRpcServer({
                 handlers: {
-                    echo: createRequestHandler({
+                    echo: createServerRequestHandler({
                         method: 'echo',
                         paramsSchema: z.object({ message: z.string() }),
                         resultSchema: z.string(),
                         handler: (params) => params.message
                     }),
-                    throw_error: createRequestHandler({
+                    throw_error: createServerRequestHandler({
                         method: 'throw_error',
                         paramsSchema: z.object({}),
                         resultSchema: z.string(),
@@ -150,7 +150,7 @@ describe('RPC server tests', () => {
                             throw new Error('Test error')
                         }
                     }),
-                    async_echo: createRequestHandler({
+                    async_echo: createServerRequestHandler({
                         method: 'async_echo',
                         paramsSchema: z.object({ message: z.string() }),
                         resultSchema: z.string(),
@@ -161,7 +161,7 @@ describe('RPC server tests', () => {
                     })
                 },
                 notifications: {
-                    log: createNotificationhandler({
+                    log: createServerNotificationHandler({
                         method: 'log',
                         paramsSchema: z.object({ message: z.string() }),
                         handler: (params) => {
@@ -318,7 +318,7 @@ describe('RPC server tests', () => {
 
             const server = new JsonRpcServer({
                 handlers: {
-                    custom_error: createRequestHandler({
+                    custom_error: createServerRequestHandler({
                         method: 'custom_error',
                         paramsSchema: z.object({}),
                         resultSchema: z.string(),
@@ -346,7 +346,7 @@ describe('RPC server tests', () => {
         test('Preserves request id in error response', async () => {
             const server = new JsonRpcServer({
                 handlers: {
-                    error_method: createRequestHandler({
+                    error_method: createServerRequestHandler({
                         method: 'error_method',
                         paramsSchema: z.object({}),
                         resultSchema: z.string(),
@@ -375,7 +375,7 @@ describe('RPC server tests', () => {
         beforeEach(() => {
             server = new JsonRpcServer({
                 handlers: {
-                    strict_params: createRequestHandler({
+                    strict_params: createServerRequestHandler({
                         method: 'strict_params',
                         paramsSchema: z.object({
                             name: z.string().min(1),
@@ -442,7 +442,7 @@ describe('RPC server tests', () => {
         test('Server handles mixed requests and notifications', async () => {
             const server = new JsonRpcServer({
                 handlers: {
-                    calculate: createRequestHandler({
+                    calculate: createServerRequestHandler({
                         method: 'calculate',
                         paramsSchema: z.object({ operation: z.string(), a: z.number(), b: z.number() }),
                         resultSchema: z.number(),
@@ -463,7 +463,7 @@ describe('RPC server tests', () => {
                     })
                 },
                 notifications: {
-                    audit: createNotificationhandler({
+                    audit: createServerNotificationHandler({
                         method: 'audit',
                         paramsSchema: z.object({ action: z.string(), timestamp: z.number() }),
                         handler: (params) => {}
@@ -494,13 +494,13 @@ describe('RPC server tests', () => {
         test('Server handles edge cases', async () => {
             const server = new JsonRpcServer({
                 handlers: {
-                    null_result: createRequestHandler({
+                    null_result: createServerRequestHandler({
                         method: 'null_result',
                         paramsSchema: z.object({}),
                         resultSchema: z.null(),
                         handler: () => null
                     }),
-                    empty_string: createRequestHandler({
+                    empty_string: createServerRequestHandler({
                         method: 'empty_string',
                         paramsSchema: z.object({}),
                         resultSchema: z.string(),

@@ -1,8 +1,13 @@
 import {
+    type JsonRpcErrorResponse,
+    JsonRpcErrorResponseSchema,
     type JsonRpcNotification,
     JsonRpcNotificationSchema,
     type JsonRpcRequest,
-    JsonRpcRequestSchema
+    JsonRpcRequestSchema,
+    type JsonRpcResponse,
+    type JsonRpcSuccessResponse,
+    JsonRpcSuccessResponseSchema
 } from './json-rpc'
 
 export type Fallbackhandler = (methodName: string, params: any) => any | Promise<any>
@@ -27,4 +32,14 @@ export function isJsonRpcNotification(message: any): message is JsonRpcNotificat
 export function isJsonRpcRequest(message: any): message is JsonRpcRequest<string, any> {
     const { success } = JsonRpcRequestSchema.safeParse(message)
     return success && Object.hasOwn(message, 'id')
+}
+
+export function isJsonRpcSuccessResponse(response: JsonRpcResponse): response is JsonRpcSuccessResponse {
+    const { success } = JsonRpcSuccessResponseSchema.safeParse(response)
+    return success && !Object.hasOwn(response, 'error')
+}
+
+export function isJsonRpcErrorResponse(response: JsonRpcResponse): response is JsonRpcErrorResponse {
+    const { success } = JsonRpcErrorResponseSchema.safeParse(response)
+    return success
 }

@@ -2,10 +2,10 @@ import { describe, expect, test } from 'bun:test'
 import {
     JsonRpcBatchRequestSchema,
     JsonRpcErrorResponseSchema,
+    JsonRpcMessageSchema,
     JsonRpcNotificationSchema,
     JsonRpcRequestSchema,
     JsonRpcResponseSchema,
-    JsonRpcServerMessageSchema,
     JsonRpcSuccessResponseSchema
 } from '../src/json-rpc'
 
@@ -429,7 +429,7 @@ describe('RPC schema tests', () => {
                 method: 'test_method',
                 id: 'test-id'
             }
-            const result = JsonRpcServerMessageSchema.safeParse(validRequest)
+            const result = JsonRpcMessageSchema.safeParse(validRequest)
             expect(result.success).toBe(true)
         })
 
@@ -438,7 +438,7 @@ describe('RPC schema tests', () => {
                 jsonrpc: '2.0',
                 method: 'notify_method'
             }
-            const result = JsonRpcServerMessageSchema.safeParse(validNotification)
+            const result = JsonRpcMessageSchema.safeParse(validNotification)
             expect(result.success).toBe(true)
         })
         test('Response should fail', () => {
@@ -447,7 +447,7 @@ describe('RPC schema tests', () => {
                 result: 'success',
                 id: 'test-id'
             }
-            const result = JsonRpcServerMessageSchema.safeParse(response)
+            const result = JsonRpcMessageSchema.safeParse(response)
             expect(result.success).toBe(false)
         })
 
@@ -455,7 +455,7 @@ describe('RPC schema tests', () => {
             const invalidMessage = {
                 method: 'test_method'
             }
-            const result = JsonRpcServerMessageSchema.safeParse(invalidMessage)
+            const result = JsonRpcMessageSchema.safeParse(invalidMessage)
             expect(result.success).toBe(false)
         })
     })

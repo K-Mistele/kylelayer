@@ -2,7 +2,7 @@ import type z from 'zod'
 
 export const JsonRpcErrorCodes = {
     PARSE_ERROR: -32700,
-    INVALID_REQUEST: -3600,
+    INVALID_REQUEST: -32600,
     METHOD_NOT_FOUND: -32601,
     INVALID_PARAMETERS: -32606,
     INTERNAL_SERVER_ERROR: -32603,
@@ -11,15 +11,23 @@ export const JsonRpcErrorCodes = {
 
 export const JsonRpcCustomErrorCodes = {} as const
 
+export const standardErrorCodes: Array<(typeof JsonRpcErrorCodes)[keyof typeof JsonRpcErrorCodes]> =
+    Object.values(JsonRpcErrorCodes)
+
+export const customErrorCodes: Array<(typeof JsonRpcCustomErrorCodes)[keyof typeof JsonRpcCustomErrorCodes]> =
+    Object.values(JsonRpcCustomErrorCodes)
+
+export const allErrorCodes = [...standardErrorCodes, ...customErrorCodes]
+
 export class JsonRpcError extends Error {
-    public code: (typeof JsonRpcErrorCodes)[keyof typeof JsonRpcErrorCodes]
+    public code: number
     public data?: any
     public requestId: number | string | null
 
     constructor(options: {
         requestId: number | string | null
         error: {
-            code: (typeof JsonRpcErrorCodes)[keyof typeof JsonRpcErrorCodes]
+            code: number
             message: string
             data?: any
         }

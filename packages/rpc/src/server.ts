@@ -1,5 +1,4 @@
-import { sessionSchema } from '@kylelayer/protocol'
-import { z } from 'zod'
+import type { z } from 'zod'
 import {
     CustomServerError,
     InvalidParametersError,
@@ -9,10 +8,10 @@ import {
 } from './errors'
 import {
     type JsonRpcErrorResponse,
+    JsonRpcMessageSchema,
     type JsonRpcNotification,
     type JsonRpcRequest,
     type JsonRpcResponse,
-    JsonRpcServerMessageSchema,
     type JsonRpcSuccessResponse
 } from './json-rpc'
 import { type Fallbackhandler as FallbackHandler, isJsonRpcRequest } from './types'
@@ -24,7 +23,7 @@ import { type Fallbackhandler as FallbackHandler, isJsonRpcRequest } from './typ
  * @param result
  * @returns
  */
-export function createRequestHandler<
+export function createServerRequestHandler<
     T_METHOD extends string,
     T_PARAMS extends z.ZodType,
     T_RESULT extends z.ZodType
@@ -43,7 +42,7 @@ export function createRequestHandler<
     } as const
 }
 
-export function createNotificationhandler<T_METHOD extends string, T_PARAMS extends z.ZodType>(options: {
+export function createServerNotificationHandler<T_METHOD extends string, T_PARAMS extends z.ZodType>(options: {
     method: T_METHOD
     paramsSchema: T_PARAMS
     handler: (params: any) => void | Promise<void>
@@ -110,9 +109,8 @@ export class JsonRpcServer<
     public async handleMessage(
         serverMessage: any
     ): Promise<JsonRpcResponse<z.infer<T_HANDLERS[keyof T_HANDLERS]['resultSchema']>> | null> {
-        console.log('parsing message:', serverMessage)
         // Validate it as a JSON RPC request / notification; throwing the correct error if appropriate
-        const { data, error } = JsonRpcServerMessageSchema.safeParse(serverMessage)
+        const { data, error } = JsonRpcMessageSchema.safeParse(serverMessage)
 
         if (error) {
             return {
@@ -174,7 +172,6 @@ export class JsonRpcServer<
             z.infer<T_HANDLERS[keyof T_HANDLERS]['paramsSchema']>
         >
     ): Promise<JsonRpcSuccessResponse> {
-        console.log('handling request:', request)
         // validate the method
         const method = this.handlers[request.method]
         if (!method) throw new MethodNotFoundError({ requestId: request.id, method: request.method })
@@ -213,20 +210,3 @@ export class JsonRpcServer<
         await Promise.resolve(method.handler(params))
     }
 }
-
-const handler = new JsonRpcServer({
-    handlers: {
-        list_sessions: createRequestHandler({
-            method: 'list_sessions',
-            paramsSchema: z.object({ test: z.string().optional() }),
-            resultSchema: z.array(sessionSchema),
-            handler: (params) => {
-                return []
-            }
-        })
-    },
-    notifications: {},
-    unknownMethodHandler: (method: string, params: any) => {
-        console.warn(`Invalid method ${method} (`, params, ')')
-    }
-})

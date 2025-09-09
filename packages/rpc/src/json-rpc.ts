@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { allErrorCodes } from './errors'
 
 export const JsonRpcRequestSchema = z
     .object({
@@ -29,6 +30,7 @@ export const JsonRpcErrorResponseSchema = z
         })
     })
     .strict()
+    .refine((o) => allErrorCodes.includes(o.error.code as (typeof allErrorCodes)[number]))
 export type JsonRpcErrorResponse = z.infer<typeof JsonRpcErrorResponseSchema>
 export type JsonRpcSuccessResponse = z.infer<typeof JsonRpcSuccessResponseSchema>
 
@@ -54,5 +56,5 @@ export const JsonRpcNotificationSchema = z
 
 export type JsonRpcNotification = z.infer<typeof JsonRpcNotificationSchema>
 
-export const JsonRpcServerMessageSchema = z.union([JsonRpcRequestSchema, JsonRpcNotificationSchema])
-export type JsonRpcServerMessage = z.infer<typeof JsonRpcServerMessageSchema>
+export const JsonRpcMessageSchema = z.union([JsonRpcRequestSchema, JsonRpcNotificationSchema])
+export type JsonRpcMessage = z.infer<typeof JsonRpcMessageSchema>
